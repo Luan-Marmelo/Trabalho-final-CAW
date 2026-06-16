@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cardápio digital interativo com filtros por categoria." />
+    <title>Cardápio Digital — Sabor & Cia</title>
+    <link rel="icon" href="assets/images/logo.png" />
+
+
+    <!-- Google Fonts: Playfair Display (display) + Inter (corpo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"/>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configuração de tokens customizados do Tailwind -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                bg:       '#0F1117',   /* fundo principal: quase-preto azulado */
+                surface:  '#1A1D27',   /* cards e seções */
+                border:   '#2A2D3A',   /* bordas sutis */
+                accent:   '#E8A020',   /* âmbar quente — cor dos pratos, orgânica */
+                green:    '#4ADE80',   /* vegano */
+                text:     '#E8E9F0',   /* texto principal */
+                muted:    '#7C7F96',   /* texto secundário */
+              },
+            },
+            fontFamily: {
+              display: ['"Playfair Display"', 'Georgia', 'serif'],
+              body:    ['"Inter"', 'system-ui', 'sans-serif'],
+            },
+          },
+        },
+      }
+    </script>
+
+    <!-- CSS customizado (animações e utilitários que Tailwind não cobre) -->
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+
+  <body class="bg-brand-bg text-brand-text font-body antialiased">
+
+
+    <!-- =============================================
+         HEADER — Nome do restaurante e slogan
+    ============================================= -->
+    <header class="site-header sticky top-0 z-50 bg-brand-bg/90 backdrop-blur-md border-b border-brand-border">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+
+        <!-- Marca -->
+        <div class="header-brand flex items-center gap-3">
+          <img src="assets/images/logo.png" alt="Logo Sabor & Cia" class="header-logo" style="height: 40px; width: auto;">
+          <div class="header-text">
+            <h1 class="header-title font-display text-2xl font-bold text-brand-text leading-tight">
+              Sabor <span class="text-brand-accent">&</span> Cia
+            </h1>
+            <p class="header-subtitle text-xs text-brand-muted tracking-wide uppercase">
+              Cardápio digital
+            </p>
+          </div>
+        </div>
+
+        <!-- Indicador de mesa -->
+        <div class="header-table hidden sm:flex items-center gap-2 text-brand-muted text-sm">
+          <span class="text-brand-accent">◆</span>
+          Mesa <strong class="text-brand-text ml-1">07</strong>
+        </div>
+
+      </div>
+    </header>
+    <!-- /HEADER -->
+
+
+    <!-- =============================================
+         MAIN — Conteúdo principal
+    ============================================= -->
+    <main class="site-main max-w-6xl mx-auto px-4 sm:px-6 py-10">
+
+
+      <!-- ==========================================
+           HERO — Chamada de boas-vindas
+      ========================================== -->
+      <section class="hero-section mb-12 text-center">
+        <p class="hero-eyebrow text-brand-accent text-sm font-semibold tracking-widest uppercase mb-2">
+          Bem-vindo
+        </p>
+        <h2 class="hero-title font-display text-4xl sm:text-5xl font-bold text-brand-text leading-tight mb-3">
+          O que vai ser hoje?
+        </h2>
+        <p class="hero-sub text-brand-muted max-w-md mx-auto text-base">
+          Filtre pelo que você tá com vontade e adicione ao pedido.
+        </p>
+      </section>
+      <!-- /HERO -->
+
+
+      <!-- ==========================================
+           SEÇÃO: Barra de Filtros por Categoria
+           JS: ao clicar, atualiza aria-pressed,
+           alterna .active e filtra os cards
+      ========================================== -->
+      <section class="filter-section mb-10" aria-label="Filtrar por categoria">
+
+        <div
+          class="filter-bar flex flex-wrap gap-2 justify-center"
+          role="group"
+          aria-label="Categorias do cardápio"
+        >
+
+          <!-- data-category="all" exibe todos os itens -->
+          <button
+            class="filter-btn active"
+            data-category="all"
+            aria-pressed="true"
+          >
+            Tudo
+          </button>
+
+          <button
+            class="filter-btn"
+            data-category="lanches"
+            aria-pressed="false"
+          >
+            🥪 Lanches
+          </button>
+
+          <button
+            class="filter-btn"
+            data-category="pratos"
+            aria-pressed="false"
+          >
+            🍽️ Pratos
+          </button>
+
+          <button
+            class="filter-btn"
+            data-category="bebidas"
+            aria-pressed="false"
+          >
+            🥤 Bebidas
+          </button>
+
+          <button
+            class="filter-btn"
+            data-category="vegano"
+            aria-pressed="false"
+          >
+            🌱 Vegano
+          </button>
+
+          <button
+            class="filter-btn"
+            data-category="sobremesas"
+            aria-pressed="false"
+          >
+            🍰 Sobremesas
+          </button>
+
+        </div>
+
+      </section>
+      <!-- /SEÇÃO Filtros -->
+
+
+      <!-- ==========================================
+           SEÇÃO: Grade de Itens do Cardápio
+           JS: esconde/exibe cards via .hidden
+           com base no data-category e filtro ativo
+      ========================================== -->
+      <section class="menu-section" aria-label="Itens do cardápio">
+
+        <!-- Mensagem de estado vazio -->
+        <!-- JS: remove/adiciona o atributo hidden -->
+        <p
+          class="menu-empty-message text-center text-brand-muted py-20 text-lg"
+          hidden
+          aria-live="polite"
+        >
+          Nenhum item encontrado nesta categoria.
+        </p>
+
+        <!-- Grade de cards — responsive: 1 col mobile, 2 tablet, 3 desktop -->
+        <div
+          class="menu-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          id="menuGrid"
+        >
+
+
+          <!-- ======================================
+               CARD — Estrutura reutilizável
+               data-category deve bater com os
+               valores usados nos botões de filtro
+          ====================================== -->
+
+          <!-- CARD: X-Burger -->
+          <article
+            class="menu-card bg-brand-surface border border-brand-border rounded-2xl overflow-hidden flex flex-col"
+            data-category="lanches"
+            aria-label="X-Burger"
+          >
+            <div class="menu-card-image-wrapper relative overflow-hidden h-48">
+              <img
+                class="menu-card-image w-full h-full object-cover"
+                src="assets/images/hamburguer.jpg"
+                alt="X-Burger artesanal com alface, tomate e queijo"
+                loading="lazy"
+              />
+              <span
+                class="menu-card-badge absolute top-3 left-3 bg-brand-accent text-brand-bg text-xs font-semibold px-3 py-1 rounded-full"
+                aria-label="Categoria: Lanches"
+              >
+                Lanches
+              </span>
+            </div>
+            <div class="menu-card-body flex flex-col flex-1 p-5 gap-3">
+              <h3 class="menu-card-name font-display text-lg font-bold text-brand-text">
+                X-Burger Artesanal
+              </h3>
+              <p class="menu-card-description text-sm text-brand-muted leading-relaxed flex-1">
+                Pão brioche, blend 180g, queijo cheddar, alface americana e tomate.
+              </p>
+              <div class="menu-card-footer flex items-center justify-between pt-2 border-t border-brand-border">
+                <span
+                  class="menu-card-price font-semibold text-brand-accent text-base"
+                  aria-label="Preço: R$ 32,90"
+                >
+                  R$&nbsp;32,90
+                </span>
+                <button
+                  class="menu-card-btn"
+                  aria-label="Adicionar X-Burger ao pedido"
+                >
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
+          <!-- /CARD X-Burger -->
+
+
+          <!-- CARD: Frango Grelhado -->
+          <article
+            class="menu-card bg-brand-surface border border-brand-border rounded-2xl overflow-hidden flex flex-col"
+            data-category="pratos"
+            aria-label="Frango Grelhado"
+          >
+            <div class="menu-card-image-wrapper relative overflow-hidden h-48">
+              <img
+                class="menu-card-image w-full h-full object-cover"
+                src="assets/images/frango-grelhado-ao-pesto.jpg"
+                alt="Prato de frango grelhado com arroz e salada"
+                loading="lazy"
+              />
+              <span
+                class="menu-card-badge absolute top-3 left-3 bg-brand-accent text-brand-bg text-xs font-semibold px-3 py-1 rounded-full"
+                aria-label="Categoria: Pratos"
+              >
+                Pratos
+              </span>
+            </div>
+            <div class="menu-card-body flex flex-col flex-1 p-5 gap-3">
+              <h3 class="menu-card-name font-display text-lg font-bold text-brand-text">
+                Frango Grelhado
+              </h3>
+              <p class="menu-card-description text-sm text-brand-muted leading-relaxed flex-1">
+                Filé de frango temperado, arroz integral, feijão e salada verde.
+              </p>
+              <div class="menu-card-footer flex items-center justify-between pt-2 border-t border-brand-border">
+                <span
+                  class="menu-card-price font-semibold text-brand-accent text-base"
+                  aria-label="Preço: R$ 38,00"
+                >
+                  R$&nbsp;38,00
+                </span>
+                <button
+                  class="menu-card-btn"
+                  aria-label="Adicionar Frango Grelhado ao pedido"
+                >
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
+          <!-- /CARD Frango Grelhado -->
+
+
+          <!-- CARD: Suco de Laranja -->
+          <article
+            class="menu-card bg-brand-surface border border-brand-border rounded-2xl overflow-hidden flex flex-col"
+            data-category="bebidas"
+            aria-label="Suco de Laranja"
+          >
+            <div class="menu-card-image-wrapper relative overflow-hidden h-48">
+              <img
+                class="menu-card-image w-full h-full object-cover"
+                src="assets/images/suco-de-laranja-natural.jpg"
+                alt="Copo de suco de laranja natural"
+                loading="lazy"
+              />
+              <span
+                class="menu-card-badge absolute top-3 left-3 bg-brand-accent text-brand-bg text-xs font-semibold px-3 py-1 rounded-full"
+                aria-label="Categoria: Bebidas"
+              >
+                Bebidas
+              </span>
+            </div>
+            <div class="menu-card-body flex flex-col flex-1 p-5 gap-3">
+              <h3 class="menu-card-name font-display text-lg font-bold text-brand-text">
+                Suco de Laranja
+              </h3>
+              <p class="menu-card-description text-sm text-brand-muted leading-relaxed flex-1">
+                400ml de suco natural espremido na hora. Sem açúcar adicionado.
+              </p>
+              <div class="menu-card-footer flex items-center justify-between pt-2 border-t border-brand-border">
+                <span
+                  class="menu-card-price font-semibold text-brand-accent text-base"
+                  aria-label="Preço: R$ 12,00"
+                >
+                  R$&nbsp;12,00
+                </span>
+                <button
+                  class="menu-card-btn"
+                  aria-label="Adicionar Suco de Laranja ao pedido"
+                >
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
+          <!-- /CARD Suco de Laranja -->
+
+
+          <!-- CARD: Buddha Bowl (vegano) -->
+          <article
+            class="menu-card bg-brand-surface border border-brand-border rounded-2xl overflow-hidden flex flex-col"
+            data-category="vegano"
+            aria-label="Buddha Bowl"
+          >
+            <div class="menu-card-image-wrapper relative overflow-hidden h-48">
+              <img
+                class="menu-card-image w-full h-full object-cover"
+                src="assets/images/buddha-bowl.jpg"
+                alt="Bowl colorido com grãos, legumes e molho tahine"
+                loading="lazy"
+              />
+              <span
+                class="menu-card-badge menu-card-badge--vegano absolute top-3 left-3 bg-brand-green text-brand-bg text-xs font-semibold px-3 py-1 rounded-full"
+                aria-label="Categoria: Vegano"
+              >
+                🌱 Vegano
+              </span>
+            </div>
+            <div class="menu-card-body flex flex-col flex-1 p-5 gap-3">
+              <h3 class="menu-card-name font-display text-lg font-bold text-brand-text">
+                Buddha Bowl
+              </h3>
+              <p class="menu-card-description text-sm text-brand-muted leading-relaxed flex-1">
+                Quinoa, grão-de-bico, cenoura assada, abacate e molho tahine.
+              </p>
+              <div class="menu-card-footer flex items-center justify-between pt-2 border-t border-brand-border">
+                <span
+                  class="menu-card-price font-semibold text-brand-accent text-base"
+                  aria-label="Preço: R$ 36,50"
+                >
+                  R$&nbsp;36,50
+                </span>
+                <button
+                  class="menu-card-btn"
+                  aria-label="Adicionar Buddha Bowl ao pedido"
+                >
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
+          <!-- /CARD Buddha Bowl -->
+
+
+          <!-- CARD: Petit Gateau -->
+          <article
+            class="menu-card bg-brand-surface border border-brand-border rounded-2xl overflow-hidden flex flex-col"
+            data-category="sobremesas"
+            aria-label="Petit Gateau"
+          >
+            <div class="menu-card-image-wrapper relative overflow-hidden h-48">
+              <img
+                class="menu-card-image w-full h-full object-cover"
+                src="assets/images/petit_gateau.png"
+                alt="Petit gateau de chocolate com sorvete de baunilha"
+                loading="lazy"
+              />
+              <span
+                class="menu-card-badge absolute top-3 left-3 bg-brand-accent text-brand-bg text-xs font-semibold px-3 py-1 rounded-full"
+                aria-label="Categoria: Sobremesas"
+              >
+                Sobremesas
+              </span>
+            </div>
+            <div class="menu-card-body flex flex-col flex-1 p-5 gap-3">
+              <h3 class="menu-card-name font-display text-lg font-bold text-brand-text">
+                Petit Gateau
+              </h3>
+              <p class="menu-card-description text-sm text-brand-muted leading-relaxed flex-1">
+                Bolinho de chocolate quente com coração cremoso e sorvete de baunilha.
+              </p>
+              <div class="menu-card-footer flex items-center justify-between pt-2 border-t border-brand-border">
+                <span
+                  class="menu-card-price font-semibold text-brand-accent text-base"
+                  aria-label="Preço: R$ 28,00"
+                >
+                  R$&nbsp;28,00
+                </span>
+                <button
+                  class="menu-card-btn"
+                  aria-label="Adicionar Petit Gateau ao pedido"
+                >
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
+          <!-- /CARD Petit Gateau -->
+
+
+          <!-- CARD: Wrap de Legumes (vegano) -->
+          <article
+            class="menu-card bg-brand-surface border border-brand-border rounded-2xl overflow-hidden flex flex-col"
+            data-category="vegano"
+            aria-label="Wrap de Legumes"
+          >
+            <div class="menu-card-image-wrapper relative overflow-hidden h-48">
+              <img
+                class="menu-card-image w-full h-full object-cover"
+                src="assets/images/Wrap-de-legumes.jpg"
+                alt="Wrap integral recheado com legumes e húmus"
+                loading="lazy"
+              />
+              <span
+                class="menu-card-badge menu-card-badge--vegano absolute top-3 left-3 bg-brand-green text-brand-bg text-xs font-semibold px-3 py-1 rounded-full"
+                aria-label="Categoria: Vegano"
+              >
+                🌱 Vegano
+              </span>
+            </div>
+            <div class="menu-card-body flex flex-col flex-1 p-5 gap-3">
+              <h3 class="menu-card-name font-display text-lg font-bold text-brand-text">
+                Wrap de Legumes
+              </h3>
+              <p class="menu-card-description text-sm text-brand-muted leading-relaxed flex-1">
+                Tortilha integral, húmus, abobrinha, pimentão e rúcula.
+              </p>
+              <div class="menu-card-footer flex items-center justify-between pt-2 border-t border-brand-border">
+                <span
+                  class="menu-card-price font-semibold text-brand-accent text-base"
+                  aria-label="Preço: R$ 24,90"
+                >
+                  R$&nbsp;24,90
+                </span>
+                <button
+                  class="menu-card-btn"
+                  aria-label="Adicionar Wrap de Legumes ao pedido"
+                >
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
+          <!-- /CARD Wrap de Legumes -->
+
+
+          <!-- CARD: Refrigerante -->
+          <article
+            class="menu-card bg-brand-surface border border-brand-border rounded-2xl overflow-hidden flex flex-col"
+            data-category="bebidas"
+            aria-label="Refrigerante Lata"
+          >
+            <div class="menu-card-image-wrapper relative overflow-hidden h-48">
+              <img
+                class="menu-card-image w-full h-full object-cover"
+                src="assets/images/LATAS-NO-GELO.png"
+                alt="Lata de refrigerante gelada"
+                loading="lazy"
+              />
+              <span
+                class="menu-card-badge absolute top-3 left-3 bg-brand-accent text-brand-bg text-xs font-semibold px-3 py-1 rounded-full"
+                aria-label="Categoria: Bebidas"
+              >
+                Bebidas
+              </span>
+            </div>
+            <div class="menu-card-body flex flex-col flex-1 p-5 gap-3">
+              <h3 class="menu-card-name font-display text-lg font-bold text-brand-text">
+                Refrigerante Lata
+              </h3>
+              <p class="menu-card-description text-sm text-brand-muted leading-relaxed flex-1">
+                350ml. Disponível em: Cola, Guaraná e Laranja.
+              </p>
+              <div class="menu-card-footer flex items-center justify-between pt-2 border-t border-brand-border">
+                <span
+                  class="menu-card-price font-semibold text-brand-accent text-base"
+                  aria-label="Preço: R$ 7,00"
+                >
+                  R$&nbsp;7,00
+                </span>
+                <button
+                  class="menu-card-btn"
+                  aria-label="Adicionar Refrigerante ao pedido"
+                >
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
+          <!-- /CARD Refrigerante -->
+
+
+          <!-- CARD: Hot Dog -->
+          <article
+            class="menu-card bg-brand-surface border border-brand-border rounded-2xl overflow-hidden flex flex-col"
+            data-category="lanches"
+            aria-label="Hot Dog Gourmet"
+          >
+            <div class="menu-card-image-wrapper relative overflow-hidden h-48">
+              <img
+                class="menu-card-image w-full h-full object-cover"
+                src="assets/images/hot-dog.png"
+                alt="Hot dog gourmet com molho especial e batata palha"
+                loading="lazy"
+              />
+              <span
+                class="menu-card-badge absolute top-3 left-3 bg-brand-accent text-brand-bg text-xs font-semibold px-3 py-1 rounded-full"
+                aria-label="Categoria: Lanches"
+              >
+                Lanches
+              </span>
+            </div>
+            <div class="menu-card-body flex flex-col flex-1 p-5 gap-3">
+              <h3 class="menu-card-name font-display text-lg font-bold text-brand-text">
+                Hot Dog Gourmet
+              </h3>
+              <p class="menu-card-description text-sm text-brand-muted leading-relaxed flex-1">
+                Salsicha artesanal, pão de leite, mostarda dijon, ketchup e batata palha.
+              </p>
+              <div class="menu-card-footer flex items-center justify-between pt-2 border-t border-brand-border">
+                <span
+                  class="menu-card-price font-semibold text-brand-accent text-base"
+                  aria-label="Preço: R$ 22,00"
+                >
+                  R$&nbsp;22,00
+                </span>
+                <button
+                  class="menu-card-btn"
+                  aria-label="Adicionar Hot Dog Gourmet ao pedido"
+                >
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
+          <!-- /CARD Hot Dog -->
+
+
+        </div>
+        <!-- /menu-grid -->
+
+      </section>
+      <!-- /SEÇÃO Cardápio -->
+
+
+      <!-- ==========================================
+           SEÇÃO: Resumo de Pedido e Checkout
+           Exibe itens no carrinho com opções de
+           gerenciamento, cálculo de total e opções
+           de "Chamar garçom" e "Fechar conta"
+      ========================================== -->
+      <section class="order-summary-section mt-16" aria-label="Resumo do pedido">
+
+        <div class="order-summary-container bg-brand-surface border border-brand-border rounded-3xl overflow-hidden">
+
+          <!-- Cabeçalho do resumo -->
+          <div class="order-summary-header bg-brand-accent/10 border-b border-brand-border px-6 sm:px-8 py-6">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-brand-text">
+              📋 Seu Pedido
+            </h2>
+            <p class="text-brand-muted text-sm mt-1">
+              Gerencie seus itens abaixo
+            </p>
+          </div>
+
+          <!-- Corpo do resumo -->
+          <div class="order-summary-body p-6 sm:p-8">
+
+            <!-- Lista de itens do carrinho -->
+            <div class="order-items-container" id="orderItemsContainer">
+              <!-- JS renderiza os itens aqui -->
+              <div class="order-empty-state text-center py-12">
+                <p class="text-brand-muted text-lg mb-4">
+                  🛒 Seu carrinho está vazio
+                </p>
+                <p class="text-brand-muted text-sm">
+                  Selecione itens do cardápio acima para começar seu pedido
+                </p>
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="order-divider my-8 border-t border-brand-border"></div>
+
+            <!-- Cálculos de total -->
+            <div class="order-calculations space-y-3">
+
+              <!-- Subtotal -->
+              <div class="order-calc-row flex items-center justify-between">
+                <span class="text-brand-muted">Subtotal:</span>
+                <span class="font-semibold text-brand-text" id="subtotalAmount">R$ 0,00</span>
+              </div>
+
+              <!-- Taxa de serviço (10%) -->
+              <div class="order-calc-row flex items-center justify-between">
+                <span class="text-brand-muted">Taxa de serviço (10%):</span>
+                <span class="font-semibold text-brand-text" id="taxAmount">R$ 0,00</span>
+              </div>
+
+              <!-- Checkbox para aplicar/remover 10% -->
+              <div class="order-tax-toggle mt-4 p-4 bg-brand-bg/50 rounded-lg flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="applyTaxCheckbox"
+                  class="w-5 h-5 cursor-pointer"
+                  aria-label="Aplicar taxa de serviço de 10%"
+                />
+                <label for="applyTaxCheckbox" class="cursor-pointer text-sm text-brand-muted flex-1">
+                  Aplicar 10% de taxa de serviço?
+                </label>
+              </div>
+
+              <!-- Total Final -->
+              <div class="order-total mt-6 pt-6 border-t border-brand-border flex items-center justify-between">
+                <span class="font-display text-xl font-bold text-brand-text">Total:</span>
+                <span class="font-display text-2xl font-bold text-brand-accent" id="totalAmount">R$ 0,00</span>
+              </div>
+
+            </div>
+
+            <!-- Divider -->
+            <div class="order-divider my-8 border-t border-brand-border"></div>
+
+            <!-- Botões de ação -->
+            <div class="order-actions flex flex-col sm:flex-row gap-4">
+
+              <!-- Chamar garçom -->
+              <button
+                id="callWaiterBtn"
+                class="order-action-btn order-action-btn--secondary flex-1"
+                aria-label="Chamar garçom"
+              >
+                🔔 Chamar Garçom
+              </button>
+
+              <!-- Fechar conta -->
+              <button
+                id="closeCheckBtn"
+                class="order-action-btn order-action-btn--primary flex-1"
+                aria-label="Fechar conta e gerar resumo de pagamento"
+              >
+                💳 Fechar Conta
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+      <!-- /SEÇÃO Resumo de Pedido -->
+
+
+    </main>
+    <!-- /MAIN -->
+
+
+    <!-- =============================================
+         FOOTER
+    ============================================= -->
+    <footer class="site-footer border-t border-brand-border mt-20 py-8 text-center text-brand-muted text-sm">
+      <div class="max-w-6xl mx-auto px-4">
+        <p class="footer-text mb-1">
+          © 2025 Sabor &amp; Cia — Todos os direitos reservados
+        </p>
+        <p class="footer-text">
+          Dúvidas? Chame o garçom ou fale pelo
+          <a class="footer-link text-brand-accent hover:underline" href="tel:+5521999999999">
+            (21) 9 9999-9999
+          </a>
+        </p>
+      </div>
+    </footer>
+    <!-- /FOOTER -->
+
+
+    <!-- JavaScript próprio -->
+    <script src="assets/js/main.js"></script>
+
+  </body>
+
+</html>
