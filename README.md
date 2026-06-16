@@ -315,25 +315,3 @@ Edite `assets/js/main.js` para funcionalidades novas
 Este projeto foi desenvolvido como trabalho de conclusão para a disciplina **CAW (Construção de Aplicações Web)** e está disponível para uso educacional.
 
 ---
-
-## 📞 Contato & Suporte
-
-**Restaurante**: Sabor & Cia  
-**Telefone**: (21) 9 9999-9999  
-**Desenvolvedor**: Sistema Digital do Cardápio  
-
----
-
-## 🙏 Agradecimentos
-
-- Tailwind CSS pela excelente framework
-- Google Fonts pelas tipografias
-- Comunidade JavaScript pela inspiração
-- Professores da CAW pelos ensinamentos
-
----
-
-**Versão**: 1.0  
-**Data**: Junho 2026  
-**Status**: ✅ Completo e Funcional
-
